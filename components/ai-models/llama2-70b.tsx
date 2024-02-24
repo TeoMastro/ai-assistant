@@ -1,10 +1,11 @@
 "use client";
 import { SetStateAction, useState } from "react";
 import axios from "axios";
+import { ChatMessage } from "@ext/types";
 
-export const Llama270bButton = () => {
+export const Llama70b = () => {
 	const togetherApiKey = process.env.NEXT_PUBLIC_TOGETHER_API_KEY;
-	const [completion, setCompletion] = useState("");
+	const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 	const [prompt, setPrompt] = useState("");
 
 	const handleChange = (event: {
@@ -14,6 +15,10 @@ export const Llama270bButton = () => {
 	};
 
 	const generateCompletion = async (e: { preventDefault: () => void }) => {
+		if (prompt === "") {
+			return;
+		}
+
 		e.preventDefault();
 		axios
 			.post(
@@ -38,7 +43,13 @@ export const Llama270bButton = () => {
 			)
 			.then(
 				(response) => {
-					setCompletion(response.data.choices[0].message.content);
+					const newMessage: ChatMessage = {
+						prompt: prompt,
+						completion: response.data.choices[0].message.content,
+					};
+					setChatHistory([...chatHistory, newMessage]);
+					setPrompt("");
+					console.log(chatHistory);
 				},
 				(error) => {
 					console.log(error);
@@ -48,37 +59,38 @@ export const Llama270bButton = () => {
 
 	return (
 		<>
-			{/* Conditionally render this div if completion is not empty */}
-			{completion && (
-				<div className="mt-4 p-4 bg-gray-100 rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-					<p className="text-sm text-gray-900 dark:text-white">
-						Completion:
-					</p>
-					<p className="text-sm text-gray-600 dark:text-gray-400">
-						{completion}
-					</p>
-				</div>
-			)}
-			<div>
-				<label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-					User Prompt
-				</label>
+			<div className="height-full-custom overflow-auto p-2 rounded-lg border border-gray-300 dark:bg-gray-800 dark:border-gray-700">
+				{chatHistory.length > 0 && (
+					<div className="p-4 bg-gray-100 dark:bg-gray-700">
+						{chatHistory.map((message, index) => (
+							<div
+								key={index}
+								className="text-sm text-gray-600 dark:text-gray-400"
+							>
+								<strong>Prompt:</strong> {message.prompt}
+								<br />
+								<strong>Completion:</strong>{" "}
+								{message.completion}
+							</div>
+						))}
+					</div>
+				)}
+			</div>
+			<div className="mt-3">
 				<textarea
-					id="message"
 					className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 					placeholder="Write your thoughts here..."
 					value={prompt}
 					onChange={handleChange}
 				></textarea>
+				<button
+					type="button"
+					onClick={generateCompletion}
+					className="w-full mt-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+				>
+					Send
+				</button>
 			</div>
-
-			<button
-				type="button"
-				onClick={generateCompletion}
-				className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-			>
-				Default
-			</button>
 		</>
 	);
 };
