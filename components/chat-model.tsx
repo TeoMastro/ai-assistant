@@ -2,8 +2,13 @@
 import { SetStateAction, useState } from "react";
 import axios from "axios";
 import { ChatMessage } from "@ext/types";
+import { usePathname } from 'next/navigation';
 
-export const Llama70b = () => {
+export const ChatModel = () => {
+	const path = usePathname();
+	const id = path.lastIndexOf("/");
+	// TODO: GET ALL MESSAGES HERE!
+
 	const togetherApiKey = process.env.NEXT_PUBLIC_TOGETHER_API_KEY;
 	const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 	const [prompt, setPrompt] = useState("");
@@ -49,7 +54,6 @@ export const Llama70b = () => {
 					};
 					setChatHistory([...chatHistory, newMessage]);
 					setPrompt("");
-					console.log(chatHistory);
 				},
 				(error) => {
 					console.log(error);

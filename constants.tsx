@@ -15,10 +15,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
 	{
 		title: "Sessions",
 		icon: <Icon icon="lucide:folder" width="24" height="24" />,
-		submenu: true,
-		subMenuItems: [
-			{ title: "LLama2 Chat", path: "/llama2-70b" },
-		],
+		path: "/sessions",
 	},
 	{
 		title: "Settings",

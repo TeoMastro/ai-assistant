@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 				status: 401,
 			});
 		}
-        const userId = +session.user?.id;
+		const userId = +session.user?.id;
 		const { name, modelName } = await req.json();
 
 		if (!name || !modelName) {
@@ -29,14 +29,13 @@ export async function POST(req: Request) {
 
 		const llmSession = await prisma.llmSession.create({
 			data: {
-                userId,
+				userId,
 				name,
 				modelName,
 			},
 		});
 		return NextResponse.json(llmSession);
 	} catch (error) {
-        console.log(error)
 		return new Response(
 			JSON.stringify({ error: "Failed to create session" }),
 			{
