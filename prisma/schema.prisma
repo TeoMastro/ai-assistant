@@ -1,3 +1,9 @@
+enum LlmName {
+    llama2_chat
+    codellama
+    mixstral
+}
+
 generator client {
     provider = "prisma-client-js"
 }
@@ -14,6 +20,30 @@ model User {
     emailVerified DateTime? @map("email_verified")
     createdAt     DateTime  @default(now()) @map("created_at")
     updatedAt     DateTime  @updatedAt @map("updated_at")
+    llmSessions   LlmSession[]
 
     @@map("users")
+}
+
+model LlmSession {
+    id         Int      @id @default(autoincrement())
+    userId     Int      @map("user_id")
+    user       User     @relation(fields: [userId], references: [id])
+    name       String
+    modelName    LlmName @map("model_name")
+    chatMessages ChatMessage[]
+    createdAt  DateTime @default(now()) @map("created_at")
+
+    @@map("llm_sessions")
+}
+
+model ChatMessage {
+    id            Int        @id @default(autoincrement())
+    prompt        String
+    completion    String
+    llmSessionId  Int        @map("llm_session_id")
+    llmSession    LlmSession @relation(fields: [llmSessionId], references: [id])
+    createdAt     DateTime   @default(now()) @map("created_at")
+
+    @@map("chat_messages")
 }

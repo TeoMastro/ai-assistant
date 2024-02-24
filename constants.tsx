@@ -8,17 +8,17 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
 		icon: <Icon icon="lucide:home" width="24" height="24" />,
 	},
 	{
-		title: "Models",
+		title: "Create",
+		path: "/create-session",
+		icon: <Icon icon="lucide:mail" width="24" height="24" />,
+	},
+	{
+		title: "Sessions",
 		icon: <Icon icon="lucide:folder" width="24" height="24" />,
 		submenu: true,
 		subMenuItems: [
 			{ title: "LLama2 Chat", path: "/llama2-70b" },
 		],
-	},
-	{
-		title: "Messages",
-		path: "/messages",
-		icon: <Icon icon="lucide:mail" width="24" height="24" />,
 	},
 	{
 		title: "Settings",
