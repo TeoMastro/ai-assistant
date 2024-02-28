@@ -1,17 +1,24 @@
 "use client";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { ChatMessage } from "@ext/types";
-import { usePathname } from 'next/navigation';
 
-export const ChatModel = () => {
-	const path = usePathname();
-	const id = path.lastIndexOf("/");
-	// TODO: GET ALL MESSAGES HERE!
-
+export const ChatModel = (props: any) => {
+	const initialized = useRef(false)
 	const togetherApiKey = process.env.NEXT_PUBLIC_TOGETHER_API_KEY;
 	const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 	const [prompt, setPrompt] = useState("");
+
+	useEffect(() => {
+		if (!initialized.current) {
+			initialized.current = true
+			const newMessages = props.messages.map((message: any) => ({
+				prompt: message.prompt,
+				completion: message.completion,
+			}));
+			setChatHistory((prevMessages) => [...prevMessages, ...newMessages]);
+		}
+	}, [props.messages]);
 
 	const handleChange = (event: {
 		target: { value: SetStateAction<string> };
@@ -47,11 +54,13 @@ export const ChatModel = () => {
 				}
 			)
 			.then(
-				(response) => {
+				async (response) => {
 					const newMessage: ChatMessage = {
 						prompt: prompt,
 						completion: response.data.choices[0].message.content,
+						llmSessionId: props.llmSessionId,
 					};
+					await uploadMessage(newMessage);
 					setChatHistory([...chatHistory, newMessage]);
 					setPrompt("");
 				},
@@ -59,6 +68,20 @@ export const ChatModel = () => {
 					console.log(error);
 				}
 			);
+	};
+
+	const uploadMessage = async (message: ChatMessage) => {
+		try {
+			await fetch("/api/chat-message", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(message),
+			});
+		} catch (error) {
+			console.error("Uploading new message failed:", error);
+		}
 	};
 
 	return (

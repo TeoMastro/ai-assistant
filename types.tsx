@@ -9,4 +9,5 @@ export type SideNavItem = {
 export interface ChatMessage {
 	prompt: string;
 	completion: string;
+	llmSessionId?: number;
 }
