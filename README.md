@@ -28,6 +28,12 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## To migrating the database
+```bash
+npx prisma migrate
+npx prisma generate
+```
+
 ## Sources:
 - https://www.youtube.com/watch?v=2kgqPvs0j_I&t=175s
 - https://github.com/TeoMastro/docker-compose-postgres
