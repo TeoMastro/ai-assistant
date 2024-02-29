@@ -15,6 +15,7 @@ export default async function Sessions() {
 			userId: userId?.id,
 		},
 	});
+	console.log(llmSessions)
 	return (
 		<>
 			<div className="grid sm:grid-cols-1 min-[1100px]:grid-cols-2 min-[1500px]:grid-cols-3 gap-1">

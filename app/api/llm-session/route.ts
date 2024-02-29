@@ -47,3 +47,59 @@ export async function POST(req: Request) {
 		);
 	}
 }
+
+export async function DELETE(req: Request) {
+    try {
+        const session = await getServerSession(authOptions);
+
+        // Ensuring the user is authenticated
+        if (!session) {
+            return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+                status: 401,
+            });
+        }
+        const userId = +session.user?.id;
+        
+        // Assuming the session ID is sent as a query parameter or part of the URL
+        // You might need to adjust how you extract the sessionId based on your API design
+		const { sessionId } = await req.json();
+
+        if (!sessionId) {
+            return new Response(
+                JSON.stringify({ error: "Missing session ID" }),
+                {
+                    status: 400,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+        }
+		const deleteAllMessagesResponse = await prisma.chatMessage.deleteMany({
+			where: {
+				llmSessionId: +sessionId,
+			},
+		});
+		
+        const deleteResponse = await prisma.llmSession.delete({
+            where: {
+                id: +sessionId,
+                userId: userId,
+            },
+        });
+		console.log(deleteResponse)
+
+        return NextResponse.json({deleteResponse, deleteAllMessagesResponse});
+    } catch (error) {
+		console.log(error)
+        return new Response(
+            JSON.stringify({ error: "Failed to delete session" }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+    }
+}
