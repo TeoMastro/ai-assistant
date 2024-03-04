@@ -2,6 +2,7 @@
 import { SetStateAction, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { ChatMessage } from "@ext/types";
+import { revalidatePath } from "next/cache";
 
 export const ChatModel = (props: any) => {
 	const initialized = useRef(false)
@@ -79,6 +80,7 @@ export const ChatModel = (props: any) => {
 				},
 				body: JSON.stringify(message),
 			});
+			revalidatePath(`/chat-model/${props.llmSessionId}`)
 		} catch (error) {
 			console.error("Uploading new message failed:", error);
 		}
