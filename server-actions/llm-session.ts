@@ -3,6 +3,7 @@
 import { prisma } from "@ext/lib/prisma";
 import { LlmName, LlmSession } from "@prisma/client";
 import { currentUser } from "./user";
+import { revalidatePath } from "next/cache";
 
 export const deleteLlmSession = async (session: {
     id: number;
@@ -69,6 +70,7 @@ export const createLlmSession = async (formData: {
                 modelName: formData.modelName,
             },
         });
+        revalidatePath("/sessions");
         return true;
     } catch (error) {
         console.error(error);
@@ -98,6 +100,7 @@ export const updateLlmSession = async (sessionUpdate: {
                 }),
             },
         });
+        revalidatePath("/sessions");
         return true;
     } catch (error) {
         console.error("Update failed: ", error);
