@@ -6,6 +6,7 @@ import {
 	updateLlmSession,
 } from "@ext/server-actions/llm-session";
 import { LlmName } from "@prisma/client";
+import { toast } from "sonner";
 
 
 export default function SessionForm(props: {
@@ -20,7 +21,7 @@ export default function SessionForm(props: {
         }
 		const result = LlmSessionSchema.safeParse(itemToValidate);
 		if (!result.success) {
-            console.log("Something went wrong.");
+			toast.error("Please check your input data");
             return;
 		}
 
@@ -37,7 +38,10 @@ export default function SessionForm(props: {
 			name: formData.get("name") as string,
 			modelName: formData.get("modelName") as LlmName,
 		};
-		await updateLlmSession(data);
+		const didUpdate = await updateLlmSession(data);
+		if (didUpdate) {
+			toast.success("Record updated sucessfully");
+		}
 	};
 
 	const handleCreate = async (formData: FormData) => {
@@ -45,7 +49,10 @@ export default function SessionForm(props: {
 			name: formData.get("name") as string,
 			modelName: formData.get("modelName") as LlmName,
 		};
-		await createLlmSession(data);
+		const didCreate =await createLlmSession(data);
+		if (didCreate) {
+			toast.success("Record created sucessfully");
+		}
 	};
 	return (
 		<>

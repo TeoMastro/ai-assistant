@@ -1,4 +1,4 @@
-import "./globals.css"
+import "./globals.css";
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -9,6 +9,7 @@ import MarginWidthWrapper from "../components/layout/margin-width-wrapper";
 import PageWrapper from "../components/layout/page-wrapper";
 import SideNav from "../components/layout/side-nav";
 import { Providers } from "./providers";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,6 +36,7 @@ export default function RootLayout({
 								<Providers>{children}</Providers>
 							</PageWrapper>
 						</MarginWidthWrapper>
+						<Toaster closeButton richColors position="top-right"/>
 					</main>
 				</div>
 			</body>
