@@ -26,6 +26,7 @@ export const deleteLlmSession = async (session: {
                 },
             }),
         ]);
+        revalidatePath("/sessions");
         return true;
     } catch (error) {
         console.error("Transaction failed: ", error);

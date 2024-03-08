@@ -10,7 +10,11 @@ import { cn } from '../../lib/utils';
 
 const Header = () => {
   const scrolled = useScroll(5);
-  const selectedLayout = useSelectedLayoutSegment();
+  let selectedLayout = useSelectedLayoutSegment();
+  // app/layout.js -> "/" -> null
+  if (selectedLayout === null) {
+    selectedLayout = "/";
+  }
 
   return (
     <div
