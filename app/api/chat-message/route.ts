@@ -2,6 +2,7 @@ import { prisma } from "@ext/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
 	try {
@@ -33,6 +34,7 @@ export async function POST(req: Request) {
 				llmSessionId,
 			},
 		});
+		revalidatePath(`/chat/${llmSessionId}`);
 		return NextResponse.json(message);
 	} catch (error) {
 		return new Response(
