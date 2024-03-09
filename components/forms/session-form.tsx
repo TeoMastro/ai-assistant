@@ -49,7 +49,7 @@ export default function SessionForm(props: {
 			name: formData.get("name") as string,
 			modelName: formData.get("modelName") as LlmName,
 		};
-		const didCreate =await createLlmSession(data);
+		const didCreate = await createLlmSession(data);
 		if (didCreate) {
 			toast.success("Record created sucessfully");
 		}

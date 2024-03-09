@@ -1,34 +1,30 @@
-"use client";
-import { useState } from "react";
+import { successToast } from "@ext/components/toasts/display-toasts";
+import { AuthSchema } from "@ext/lib/client-validation-schemas";
+import { register } from "@ext/server-actions/auth";
+import { redirect } from "next/navigation";
 
 function Register() {
-	const [formData, setFormData] = useState({
-		email: "",
-		password: "",
-	});
+	const handleSubmit = async (formData: FormData) => {
+		"use server";
+		const itemToValidate = {
+            email: formData.get("email") as string,
+            password: formData.get("password") as string,
+        }
+		const result = AuthSchema.safeParse(itemToValidate);
+		if (!result.success) {
+			// toast.error("Please check your input data");
+            return;
+		}
 
-	const handleChange = (e: { target: { name: any; value: any } }) => {
-		const { name, value } = e.target;
-		setFormData({
-			...formData,
-			[name]: value,
-		});
-	};
-
-	const handleSubmit = async (e: { preventDefault: () => void }) => {
-		e.preventDefault();
-		try {
-			const response = await fetch("/api/register", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(formData),
-			});
-			const data = await response.json();
-			console.log("Server response:", data);
-		} catch (error) {
-			console.error("Registration failed:", error);
+		const data = {
+			email: formData.get("email") as string,
+			password: formData.get("password") as string,
+		}
+		const didRegister = await register(data);
+		if (didRegister) {
+			redirect('/');
+		} else {
+			// toast.error("Something went wrong, please try again")
 		}
 	};
 
@@ -41,8 +37,7 @@ function Register() {
 							Create an account
 						</h1>
 						<form
-							className="space-y-4 md:space-y-6"
-							onSubmit={handleSubmit}
+							action={handleSubmit}
 						>
 							<div>
 								<label
@@ -55,14 +50,11 @@ function Register() {
 									type="email"
 									name="email"
 									id="email"
-									value={formData.email}
-									onChange={handleChange}
 									required
 									className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-									placeholder="name@company.com"
 								/>
 							</div>
-							<div>
+							<div className="mb-4">
 								<label
 									htmlFor="password"
 									className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -74,8 +66,6 @@ function Register() {
 									name="password"
 									id="password"
 									placeholder="••••••••"
-									value={formData.password}
-									onChange={handleChange}
 									required
 									className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 								/>
@@ -84,7 +74,7 @@ function Register() {
 								type="submit"
 								className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
 							>
-								Create an account
+								Register
 							</button>
 						</form>
 					</div>
