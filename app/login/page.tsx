@@ -1,11 +1,11 @@
 "use client";
 
-import { errorToast, successToast } from "@ext/components/toasts/display-toasts";
+import { errorToast } from "@ext/components/toasts/display-toasts";
 import { AuthSchema } from "@ext/lib/client-validation-schemas";
-import { register } from "@ext/server-actions/auth";
+import { signIn } from "next-auth/react";
 import { redirect } from "next/navigation";
 
-function Register() {
+function Login() {
 	const handleSubmit = async (formData: FormData) => {
 		const itemToValidate = {
             email: formData.get("email") as string,
@@ -21,13 +21,17 @@ function Register() {
 			email: formData.get("email") as string,
 			password: formData.get("password") as string,
 		}
-		const didRegister = await register(data);
-		if (didRegister) {
-			successToast("User registered successfully");
-			redirect('/login');
-		} else {
-			errorToast("Something went wrong, please try again");
-		}
+		const login = await signIn("credentials", {
+            email: data.email,
+            password: data.password,
+            redirect: false,
+        });
+        
+        if (login?.error === null) {
+            redirect('/');
+        } else {
+            errorToast("Something went wrong, please try again");
+        }
 	};
 
 	return (
@@ -36,7 +40,7 @@ function Register() {
 				<div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
 					<div className="p-6 space-y-4 md:space-y-6 sm:p-8">
 						<h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-							Create an account
+							Log in to an account
 						</h1>
 						<form
 							action={handleSubmit}
@@ -76,7 +80,7 @@ function Register() {
 								type="submit"
 								className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
 							>
-								Register
+								Login
 							</button>
 						</form>
 					</div>
@@ -86,4 +90,4 @@ function Register() {
 	);
 }
 
-export default Register;
+export default Login;

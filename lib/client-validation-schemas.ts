@@ -18,3 +18,14 @@ export const LlmSessionSchema = z.object({
         LlmName.mixstral,
     ])
 });
+
+export const AuthSchema = z.object({
+    email: z.string()
+        .trim()
+        .email({ message: "Invalid email address." })
+        .min(1, { message: "Email is required." })
+        .max(64, { message: "Email must be at most 64 characters long." }),
+    password: z.string()
+        .min(8, { message: "Password must be at least 8 characters long." })
+        .max(128, { message: "Password must be at most 128 characters long." })
+});
