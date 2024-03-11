@@ -26,6 +26,16 @@ export const ChatModel = (props: any) => {
 		setPrompt(event.target.value);
 	};
 
+	useEffect(() => {
+		const textareas = document.querySelectorAll('textarea[readOnly]');
+        textareas.forEach(textarea => {
+            if (textarea instanceof HTMLElement) {
+                textarea.style.height = 'auto';
+                textarea.style.height = `${textarea.scrollHeight + 5}px`;
+            }
+        })
+	}, [chatHistory]); // Adjust height whenever chatHistory changes
+
 	const generateCompletion = async (e: { preventDefault: () => void }) => {
 		if (prompt === "") {
 			return;
@@ -55,6 +65,7 @@ export const ChatModel = (props: any) => {
 			)
 			.then(
 				async (response) => {
+					console.log(response);
 					const newMessage: ChatMessage = {
 						prompt: prompt,
 						completion: response.data.choices[0].message.content,
@@ -92,12 +103,15 @@ export const ChatModel = (props: any) => {
 						{chatHistory.map((message, index) => (
 							<div
 								key={index}
-								className="text-sm text-gray-600 dark:text-gray-400"
+								className="mb-1 text-sm text-gray-600 dark:text-gray-400"
 							>
 								<strong>Prompt:</strong> {message.prompt}
-								<br />
-								<strong>Completion:</strong>{" "}
-								{message.completion}
+								<textarea
+                                    className="block p-2.5 w-full mt-1.5 mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    value={message.completion}
+                                    readOnly
+									style={{ resize: 'none' }}
+                                ></textarea>
 							</div>
 						))}
 					</div>
