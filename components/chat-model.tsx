@@ -4,14 +4,14 @@ import axios from "axios";
 import { ChatMessage } from "@ext/types";
 
 export const ChatModel = (props: any) => {
-	const initialized = useRef(false)
+	const initialized = useRef(false);
 	const togetherApiKey = process.env.NEXT_PUBLIC_TOGETHER_API_KEY;
 	const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 	const [prompt, setPrompt] = useState("");
 
 	useEffect(() => {
 		if (!initialized.current) {
-			initialized.current = true
+			initialized.current = true;
 			const newMessages = props.messages.map((message: any) => ({
 				prompt: message.prompt,
 				completion: message.completion,
@@ -27,13 +27,13 @@ export const ChatModel = (props: any) => {
 	};
 
 	useEffect(() => {
-		const textareas = document.querySelectorAll('textarea[readOnly]');
-        textareas.forEach(textarea => {
-            if (textarea instanceof HTMLElement) {
-                textarea.style.height = 'auto';
-                textarea.style.height = `${textarea.scrollHeight + 5}px`;
-            }
-        })
+		const textareas = document.querySelectorAll("textarea[readOnly]");
+		textareas.forEach((textarea) => {
+			if (textarea instanceof HTMLElement) {
+				textarea.style.height = "auto";
+				textarea.style.height = `${textarea.scrollHeight + 5}px`;
+			}
+		});
 	}, [chatHistory]); // Adjust height whenever chatHistory changes
 
 	const generateCompletion = async (e: { preventDefault: () => void }) => {
@@ -65,7 +65,6 @@ export const ChatModel = (props: any) => {
 			)
 			.then(
 				async (response) => {
-					console.log(response);
 					const newMessage: ChatMessage = {
 						prompt: prompt,
 						completion: response.data.choices[0].message.content,
@@ -107,11 +106,11 @@ export const ChatModel = (props: any) => {
 							>
 								<strong>Prompt:</strong> {message.prompt}
 								<textarea
-                                    className="block p-2.5 w-full mt-1.5 mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    value={message.completion}
-                                    readOnly
-									style={{ resize: 'none' }}
-                                ></textarea>
+									className="block p-2.5 w-full mt-1.5 mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+									value={message.completion}
+									readOnly
+									style={{ resize: "none" }}
+								></textarea>
 							</div>
 						))}
 					</div>
