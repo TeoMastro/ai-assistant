@@ -1,11 +1,9 @@
 "use client";
 import { SetStateAction, useEffect, useState, useRef } from "react";
-import axios from "axios";
 import { ChatMessage } from "@ext/types";
 
 export const ChatModel = (props: any) => {
 	const initialized = useRef(false);
-	const togetherApiKey = process.env.NEXT_PUBLIC_TOGETHER_API_KEY;
 	const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 	const [prompt, setPrompt] = useState("");
 
@@ -40,55 +38,26 @@ export const ChatModel = (props: any) => {
 		if (prompt === "") {
 			return;
 		}
-
 		e.preventDefault();
-		axios
-			.post(
-				"https://api.together.xyz/v1/chat/completions",
-				{
-					model: "meta-llama/Llama-2-70b-chat-hf",
-					max_tokens: 512,
-					prompt: `[INST] ${prompt} [/INST]`,
-					temperature: 0.7,
-					top_p: 0.7,
-					top_k: 50,
-					repetition_penalty: 1,
-					stream_tokens: false,
-					stop: ["[/INST]", "</s>"],
-					repetitive_penalty: 1,
-				},
-				{
-					headers: {
-						Authorization: "Bearer " + togetherApiKey,
-					},
-				}
-			)
-			.then(
-				async (response) => {
-					const newMessage: ChatMessage = {
-						prompt: prompt,
-						completion: response.data.choices[0].message.content,
-						llmSessionId: props.llmSessionId,
-					};
-					await uploadMessage(newMessage);
-					setChatHistory([...chatHistory, newMessage]);
-					setPrompt("");
-				},
-				(error) => {
-					console.log(error);
-				}
-			);
-	};
 
-	const uploadMessage = async (message: ChatMessage) => {
 		try {
-			await fetch("/api/chat-message", {
+			const response = await fetch("/api/llama-chat-70b-completion", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(message),
+				body: JSON.stringify({
+					relevantContent: null,
+					llmSessionId: props.llmSessionId,
+					prompt: prompt,
+				}),
 			});
+			if (!response.ok) {
+				return;
+			}
+			const newMessage = await response.json();
+			setChatHistory([...chatHistory, newMessage]);
+			setPrompt("");
 		} catch (error) {
 			console.error("Uploading new message failed:", error);
 		}
