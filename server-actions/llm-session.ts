@@ -124,3 +124,24 @@ export const findLlmSessionById = async (
         return null;
     }
 };
+
+export const findAllSessionsOfCurrentUser = async () => {
+    try {
+        const user = await currentUser();
+        if (!user) {
+            throw new Error("User not found");
+        }
+        const llmSessions = await prisma.llmSession.findMany({
+            where: {
+                userId: user.id,
+            },
+            orderBy: {
+                updatedAt: "desc",
+            },
+        });
+        return llmSessions;
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+};

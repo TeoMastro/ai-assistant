@@ -13,33 +13,36 @@ export async function POST(req: Request) {
 				status: 401,
 			});
 		}
-		const { prompt, llmSessionId } = await req.json();
+		const { content, llmSessionId } = await req.json();
 
-		const supabase = createClient(process.env.NEXTSUPABASE_URL, process.env.NEXTSUPABASE_KEY);
+		const supabaseUrl = process.env.SUPABASE_URL;
+		const supabaseKey = process.env.SUPABASE_KEY;
+		const supabase = createClient(supabaseUrl, supabaseKey);
 
 		const embeddingResponse = await axios.post(
 			"https://api.together.xyz/v1/embeddings",
 			{
 				model: "BAAI/bge-large-en-v1.5",
-				input: prompt,
+				input: content,
 			},
 			{
 				headers: {
 					accept: "application/json",
 					"content-type": "application/json",
-					Authorization: "Bearer " + process.env.NEXT_PUBLIC_TOGETHER_API_KEY,
+					Authorization: "Bearer " + process.env.TOGETHER_API_KEY,
 				},
 			}
 		);
 
 		await supabase.from("documents").insert({
-			content: prompt,
+			content: content,
 			embedding: embeddingResponse.data.data[0].embedding,
 			llmsessionid: llmSessionId,
 		});
 
-		return true;
+		return NextResponse.json(true);;
 	} catch (error) {
+		console.log(error);
 		return new Response(
 			JSON.stringify({ error: "Failed to create and save embedding" }),
 			{

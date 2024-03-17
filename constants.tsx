@@ -8,28 +8,33 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
 		icon: <Icon icon="lucide:home" width="24" height="24" />,
 	},
 	{
-		title: "Create",
-		path: "/create-session",
-		icon: <Icon icon="lucide:mail" width="24" height="24" />,
-	},
-	{
 		title: "Sessions",
-		icon: <Icon icon="lucide:folder" width="24" height="24" />,
+		icon: <Icon icon="lucide:message-square-more" width="24" height="24" />,
 		path: "/sessions",
 	},
 	{
-		title: "Settings",
-		path: "/settings",
-		icon: <Icon icon="lucide:settings" width="24" height="24" />,
+		title: "Create",
+		path: "/create-session",
+		icon: <Icon icon="lucide:square-plus" width="24" height="24" />,
 		submenu: true,
 		subMenuItems: [
-			{ title: "Account", path: "/settings/account" },
-			{ title: "Privacy", path: "/settings/privacy" },
+			{ title: "Embedding", path: "/create-embedding" },
+			{ title: "Llm session", path: "/create-session" },
 		],
 	},
-	{
-		title: "Help",
-		path: "/help",
-		icon: <Icon icon="lucide:help-circle" width="24" height="24" />,
-	},
+	// {
+	// 	title: "Settings",
+	// 	path: "/settings",
+	// 	icon: <Icon icon="lucide:settings" width="24" height="24" />,
+	// 	submenu: true,
+	// 	subMenuItems: [
+	// 		{ title: "Account", path: "/settings/account" },
+	// 		{ title: "Privacy", path: "/settings/privacy" },
+	// 	],
+	// },
+	// {
+	// 	title: "Help",
+	// 	path: "/help",
+	// 	icon: <Icon icon="lucide:help-circle" width="24" height="24" />,
+	// },
 ];
