@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 			llmsessionid: llmSessionId,
 		});
 
-		return NextResponse.json(true);;
+		return NextResponse.json(true);
 	} catch (error) {
 		console.log(error);
 		return new Response(

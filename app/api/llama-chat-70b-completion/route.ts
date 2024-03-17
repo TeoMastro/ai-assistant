@@ -14,11 +14,12 @@ export async function POST(req: Request) {
 				status: 401,
 			});
 		}
-		const { relevantContent, llmSessionId, prompt } = await req.json();
+		const { documents, llmSessionId, prompt } = await req.json();
 
 		let createdPrompt = "";
-		if (relevantContent) {
-			createdPrompt = `[INST] Context: ${relevantContent}. User Prompt: ${prompt} [/INST]`;
+		if (documents) {
+			const docsConcat = documents.map((obj: { content: any; }) => obj.content).join(', ');
+			createdPrompt = `[INST] Context: ${docsConcat}. User Prompt: ${prompt} [/INST]`;
 		} else {
 			createdPrompt = `[INST] ${prompt} [/INST]`;
 		}
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
 				{
 					headers: {
 						Authorization:
-							"Bearer " + process.env.NEXTPUBLIC_TOGETHER_API_KEY,
+							"Bearer " + process.env.TOGETHER_API_KEY,
 					},
 				}
 			)
@@ -69,6 +70,7 @@ export async function POST(req: Request) {
 		revalidatePath(`/chat/${llmSessionId}`);
 		return NextResponse.json(messageToReturn);
 	} catch (error) {
+		console.log(error)
 		return new Response(
 			JSON.stringify({ error: "Failed to create chat completion" }),
 			{

@@ -6,6 +6,8 @@ export const ChatModel = (props: any) => {
 	const initialized = useRef(false);
 	const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 	const [prompt, setPrompt] = useState("");
+	const [searchInEmbeddings, setSearchInEmbeddings] = useState(false);
+	const [documents, setDocuments] = useState([]);
 
 	useEffect(() => {
 		if (!initialized.current) {
@@ -34,11 +36,33 @@ export const ChatModel = (props: any) => {
 		});
 	}, [chatHistory]); // Adjust height whenever chatHistory changes
 
+	const handleCheckboxChange = (event: { target: { checked: boolean } }) => {
+		setSearchInEmbeddings(event.target.checked);
+	};
+
 	const generateCompletion = async (e: { preventDefault: () => void }) => {
 		if (prompt === "") {
 			return;
 		}
 		e.preventDefault();
+
+		if (searchInEmbeddings) {
+			const response = await fetch("/api/embedding-search", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					prompt: prompt,
+					llmSessionId: props.llmSessionId,
+				}),
+			});
+			if (!response.ok) {
+				return;
+			}
+			const docs = await response.json();
+			setDocuments(docs);
+		}
 
 		try {
 			const response = await fetch("/api/llama-chat-70b-completion", {
@@ -47,7 +71,7 @@ export const ChatModel = (props: any) => {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					relevantContent: null,
+					documents: searchInEmbeddings ? documents : null,
 					llmSessionId: props.llmSessionId,
 					prompt: prompt,
 				}),
@@ -58,6 +82,7 @@ export const ChatModel = (props: any) => {
 			const newMessage = await response.json();
 			setChatHistory([...chatHistory, newMessage]);
 			setPrompt("");
+			setDocuments([]);
 		} catch (error) {
 			console.error("Uploading new message failed:", error);
 		}
@@ -84,6 +109,19 @@ export const ChatModel = (props: any) => {
 						))}
 					</div>
 				)}
+			</div>
+			<div className="mb-1 ml-1">
+				<label className="inline-flex items-center">
+					<input
+						type="checkbox"
+						className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+						checked={searchInEmbeddings}
+						onChange={handleCheckboxChange}
+					/>
+					<span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+						Search for context in embeddings of this session
+					</span>
+				</label>
 			</div>
 			<div className="mt-3">
 				<textarea
